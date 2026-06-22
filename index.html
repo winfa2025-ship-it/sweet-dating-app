@@ -1,1851 +1,326 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sweet Dating Connect - 甜蜜約會通訊</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>甜蜜約會通訊 - Sweet Dating Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-dark: #1a1a1a;
             --bg-card: #2a2a2a;
             --bg-input: #333333;
             --text-primary: #39ff14;
-            --text-secondary: #00ff88;
-            --accent: #00ff88;
-            --accent-glow: rgba(57, 255, 20, 0.5);
-            --border: #39ff1444;
-            --gray: #888888;
-            --danger: #ff4757;
-            --warning: #ffa502;
+            --text-secondary: #7cfc00;
+            --text-muted: #999999;
+            --accent: #39ff14;
+            --accent-glow: 0 0 20px rgba(57, 255, 20, 0.5);
+            --border: #444444;
+            --gradient: linear-gradient(135deg, #39ff14 0%, #00ff88 50%, #39ff14 100%);
+            --glass: rgba(42, 42, 42, 0.8);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Exo 2', sans-serif;
             background: var(--bg-dark);
-            color: var(--text-primary);
+            color: #ffffff;
             min-height: 100vh;
             overflow-x: hidden;
         }
-
-        /* Animated Background */
-        .bg-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px);
+        .bg-animation {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at 20% 80%, rgba(57, 255, 20, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.1) 0%, transparent 50%), var(--bg-dark);
+        }
+        .grid-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background-image: linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
-            z-index: -1;
             animation: gridMove 20s linear infinite;
         }
-
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
-        }
-
-        /* Glowing Effects */
-        .glow-text {
-            text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow);
-        }
-
-        .glow-box {
-            box-shadow: 0 0 20px var(--accent-glow), inset 0 0 20px rgba(57, 255, 20, 0.1);
-        }
-
-        /* Navigation */
-        .nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(180deg, var(--bg-dark) 0%, transparent 100%);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-        }
-
-        .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: var(--text-primary);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--text-primary), var(--accent));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 10px var(--accent-glow); }
-            50% { box-shadow: 0 0 30px var(--accent-glow); }
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 5px;
-            list-style: none;
-            flex-wrap: wrap;
-        }
-
-        .nav-menu a {
-            color: var(--gray);
-            text-decoration: none;
-            padding: 10px 15px;
-            border-radius: 25px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-menu a:hover, .nav-menu a.active {
-            color: var(--text-primary);
-            background: rgba(57, 255, 20, 0.1);
-            border: 1px solid var(--border);
-        }
-
-        .nav-right {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .lang-selector {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .btn {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 25px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--text-primary), var(--accent));
-            color: var(--bg-dark);
-        }
-
-        .btn-primary:hover {
-            box-shadow: 0 0 30px var(--accent-glow);
-            transform: scale(1.05);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--text-primary);
-            border: 2px solid var(--text-primary);
-        }
-
-        .btn-outline:hover {
-            background: rgba(57, 255, 20, 0.1);
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
-
-        /* Mobile Menu */
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        /* Pages Container */
-        .page {
-            display: none;
-            min-height: 100vh;
-            padding-top: 80px;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        /* Login Page */
+        @keyframes gridMove { 0% { transform: translate(0, 0); } 100% { transform: translate(50px, 50px); } }
+        
+        /* Login Screen */
+        .login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
         .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .login-box {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 30px;
-            padding: 50px;
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-box::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent, var(--accent-glow), transparent);
-            animation: rotate 4s linear infinite;
-            opacity: 0.3;
-        }
-
-        @keyframes rotate {
-            100% { transform: rotate(360deg); }
-        }
-
-        .login-box > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        .login-logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            font-weight: 900;
-            margin-bottom: 10px;
-            line-height: 1.2;
-        }
-
-        .login-subtitle {
-            color: var(--gray);
-            font-size: 1rem;
-            margin-bottom: 30px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-            font-weight: 600;
-        }
-
-        .input-group input, .input-group select, .input-group textarea {
-            width: 100%;
-            padding: 15px 20px;
-            background: var(--bg-input);
-            border: 2px solid var(--border);
-            border-radius: 15px;
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-
-        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
-            outline: none;
-            border-color: var(--text-primary);
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
-
-        .input-group input::placeholder {
-            color: var(--gray);
-        }
-
-        .login-divider {
-            display: flex;
-            align-items: center;
-            margin: 25px 0;
-            color: var(--gray);
-        }
-
-        .login-divider::before, .login-divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        .login-divider span {
-            padding: 0 15px;
-        }
-
-        .social-login {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .social-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .social-btn:hover {
-            border-color: var(--text-primary);
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
-
-        /* Main Dashboard */
-        .dashboard {
-            padding: 100px 20px 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .hero-section {
-            text-align: center;
-            padding: 60px 20px;
-            position: relative;
-        }
-
-        .hero-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(2rem, 5vw, 4rem);
-            font-weight: 900;
-            margin-bottom: 20px;
-            line-height: 1.1;
-        }
-
-        .hero-subtitle {
-            font-size: 1.3rem;
-            color: var(--gray);
-            max-width: 600px;
-            margin: 0 auto 30px;
-        }
-
-        /* Stats Section */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin: 40px 0;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px var(--accent-glow);
-        }
-
-        .stat-number {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 900;
-        }
-
-        .stat-label {
-            color: var(--gray);
-            margin-top: 5px;
-        }
-
-        /* Section Titles */
-        .section-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .section-title::before {
-            content: '';
-            width: 5px;
-            height: 30px;
-            background: linear-gradient(180deg, var(--text-primary), var(--accent));
-            border-radius: 3px;
-        }
-
-        /* User Cards Grid */
-        .users-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .user-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 25px;
-            overflow: hidden;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .user-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px var(--accent-glow);
-        }
-
-        .user-card-header {
-            position: relative;
-            height: 180px;
-            background: linear-gradient(135deg, var(--bg-input), var(--bg-dark));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .user-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid var(--text-primary);
-            object-fit: cover;
-            background: var(--bg-input);
-        }
-
-        .user-avatar-placeholder {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid var(--text-primary);
-            background: linear-gradient(135deg, var(--text-primary), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-        }
-
-        .user-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: var(--text-primary);
-            color: var(--bg-dark);
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .user-badge.ai {
-            background: linear-gradient(135deg, #00d4ff, #00ff88);
-        }
-
-        .online-indicator {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
-            background: var(--bg-dark);
-            color: #00ff00;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .online-indicator::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            background: #00ff00;
-            border-radius: 50%;
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        .user-card-body {
-            padding: 20px;
-        }
-
-        .user-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .user-info {
-            color: var(--gray);
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .user-tag {
-            background: rgba(57, 255, 20, 0.1);
-            color: var(--text-primary);
-            padding: 4px 10px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-        }
-
-        .user-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .user-actions .btn {
-            flex: 1;
-            justify-content: center;
-            padding: 10px;
-        }
-
-        /* Filter Tabs */
-        .filter-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .filter-tab {
-            padding: 12px 25px;
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 25px;
-            color: var(--gray);
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .filter-tab:hover, .filter-tab.active {
-            color: var(--text-primary);
-            border-color: var(--text-primary);
-            background: rgba(57, 255, 20, 0.1);
-        }
-
-        /* Chat Interface */
-        .chat-container {
-            display: flex;
-            gap: 20px;
-            height: calc(100vh - 150px);
-            min-height: 500px;
-        }
-
-        .chat-sidebar {
-            width: 350px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .chat-sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .chat-sidebar-header h3 {
-            font-family: 'Orbitron', sans-serif;
-            margin-bottom: 15px;
-        }
-
-        .chat-search {
-            display: flex;
-            gap: 10px;
-        }
-
-        .chat-search input {
-            flex: 1;
-            padding: 10px 15px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            color: var(--text-primary);
-            font-family: inherit;
-        }
-
-        .chat-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-        }
-
-        .chat-item {
-            display: flex;
-            gap: 12px;
-            padding: 15px;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .chat-item:hover, .chat-item.active {
-            background: rgba(57, 255, 20, 0.1);
-        }
-
-        .chat-item-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--text-primary), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        .chat-item-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .chat-item-name {
-            font-weight: 600;
-            margin-bottom: 3px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .chat-item-preview {
-            color: var(--gray);
-            font-size: 0.85rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .chat-item-time {
-            font-size: 0.75rem;
-            color: var(--gray);
-        }
-
-        .chat-main {
-            flex: 1;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .chat-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .chat-user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .chat-user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--text-primary), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-
-        .chat-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .chat-action-btn {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-        }
-
-        .chat-action-btn:hover {
-            border-color: var(--text-primary);
-            box-shadow: 0 0 15px var(--accent-glow);
-        }
-
-        .chat-action-btn.call {
-            background: linear-gradient(135deg, var(--text-primary), var(--accent));
-            color: var(--bg-dark);
-            border: none;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .message {
-            max-width: 70%;
-            padding: 15px 20px;
-            border-radius: 20px;
-            position: relative;
-        }
-
-        .message.sent {
-            align-self: flex-end;
-            background: linear-gradient(135deg, var(--text-primary), var(--accent));
-            color: var(--bg-dark);
-            border-bottom-right-radius: 5px;
-        }
-
-        .message.received {
-            align-self: flex-start;
-            background: var(--bg-input);
-            border-bottom-left-radius: 5px;
-        }
-
-        .message-time {
-            font-size: 0.7rem;
-            opacity: 0.7;
-            margin-top: 5px;
-        }
-
-        .chat-input-area {
-            padding: 20px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 15px 20px;
-            background: var(--bg-input);
-            border: 2px solid var(--border);
-            border-radius: 25px;
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 1rem;
-        }
-
-        .chat-input:focus {
-            outline: none;
-            border-color: var(--text-primary);
-        }
-
-        .send-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--text-primary), var(--accent));
-            border: none;
-            color: var(--bg-dark);
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-
-        .send-btn:hover {
-            box-shadow: 0 0 30px var(--accent-glow);
-            transform: scale(1.1);
-        }
-
-        /* Voice Call Modal */
+            background: var(--glass); backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: 20px;
+            padding: 50px; width: 100%; max-width: 500px;
+            box-shadow: var(--accent-glow), 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+        .logo { text-align: center; margin-bottom: 40px; }
+        .logo h1 {
+            font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: 900;
+            background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes glow { from { filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.5)); } to { filter: drop-shadow(0 0 30px rgba(57, 255, 20, 0.8)); } }
+        .logo p { color: var(--text-muted); font-size: 0.9rem; margin-top: 10px; letter-spacing: 3px; text-transform: uppercase; }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 15px 20px; background: var(--bg-input);
+            border: 2px solid var(--border); border-radius: 10px;
+            color: #ffffff; font-size: 1rem; transition: all 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); box-shadow: var(--accent-glow); }
+        .btn {
+            width: 100%; padding: 18px; background: var(--gradient);
+            border: none; border-radius: 10px; color: #000;
+            font-family: 'Orbitron', sans-serif; font-size: 1.1rem; font-weight: 700;
+            cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(57, 255, 20, 0.5); }
+        .btn-secondary { background: transparent; border: 2px solid var(--accent); color: var(--accent); margin-top: 15px; }
+        .btn-secondary:hover { background: var(--accent); color: #000; }
+        .social-login { margin-top: 30px; text-align: center; }
+        .social-login p { color: var(--text-muted); margin-bottom: 15px; }
+        .social-icons { display: flex; gap: 15px; justify-content: center; }
+        .social-icon {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: var(--bg-input); border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s; font-size: 1.3rem;
+        }
+        .social-icon:hover { border-color: var(--accent); transform: translateY(-3px); }
+        .language-selector { margin-top: 30px; text-align: center; }
+        .lang-btn {
+            padding: 8px 15px; background: transparent; border: 1px solid var(--border);
+            border-radius: 20px; color: var(--text-muted); cursor: pointer; margin: 0 5px; transition: all 0.3s;
+        }
+        .lang-btn:hover, .lang-btn.active { border-color: var(--accent); color: var(--accent); }
+        
+        /* Register Modal */
         .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); display: none; align-items: center; justify-content: center; z-index: 1000;
         }
-
-        .modal-overlay.active {
-            display: flex;
+        .modal-overlay.active { display: flex; }
+        .register-box {
+            background: var(--glass); backdrop-filter: blur(20px);
+            border: 2px solid var(--accent); border-radius: 25px;
+            padding: 40px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;
         }
-
-        .voice-call-modal {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 30px;
-            padding: 50px;
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .register-box .btn-secondary { margin-top: 10px; }
+        
+        /* App Container */
+        .app-container { display: none; min-height: 100vh; }
+        .app-container.active { display: block; }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px; background: var(--glass); backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border); padding: 30px 20px;
+            position: fixed; height: 100vh; overflow-y: auto; z-index: 100;
         }
-
-        .call-avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--text-primary), var(--accent));
-            margin: 0 auto 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            animation: callPulse 2s infinite;
+        .sidebar-header { text-align: center; padding-bottom: 30px; border-bottom: 1px solid var(--border); margin-bottom: 30px; }
+        .user-avatar {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: var(--gradient); margin: 0 auto 15px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; border: 3px solid var(--accent); box-shadow: var(--accent-glow);
         }
-
-        @keyframes callPulse {
-            0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
-            50% { box-shadow: 0 0 0 30px transparent; }
+        .user-name { font-family: 'Orbitron', sans-serif; color: var(--accent); font-size: 1.1rem; }
+        .user-status { color: var(--text-muted); font-size: 0.8rem; margin-top: 5px; }
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(57, 255, 20, 0.2); padding: 5px 12px;
+            border-radius: 20px; color: var(--accent); font-size: 0.75rem;
         }
-
-        .call-user-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            margin-bottom: 10px;
+        .status-badge::before {
+            content: ''; width: 8px; height: 8px; background: var(--accent);
+            border-radius: 50%; animation: pulse 2s infinite;
         }
-
-        .call-status {
-            color: var(--gray);
-            margin-bottom: 40px;
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .nav-menu { list-style: none; }
+        .nav-item { margin-bottom: 8px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 15px; padding: 15px 20px;
+            color: var(--text-muted); text-decoration: none; border-radius: 12px;
+            transition: all 0.3s; cursor: pointer;
         }
-
-        .call-timer {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            color: var(--text-primary);
-            margin-bottom: 30px;
+        .nav-link:hover, .nav-link.active { background: rgba(57, 255, 20, 0.1); color: var(--accent); }
+        .nav-link.active { border-left: 3px solid var(--accent); }
+        .nav-icon { font-size: 1.3rem; width: 30px; text-align: center; }
+        .nav-divider { height: 1px; background: var(--border); margin: 20px 0; }
+        .subscription-box {
+            background: linear-gradient(135deg, rgba(57, 255, 20, 0.1), rgba(0, 255, 136, 0.1));
+            border: 1px solid var(--accent); border-radius: 15px; padding: 20px; margin-top: 20px;
         }
-
-        .call-actions {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
+        .subscription-box h4 { color: var(--accent); font-family: 'Orbitron', sans-serif; font-size: 0.9rem; margin-bottom: 10px; }
+        .subscription-box p { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 15px; }
+        .sub-plans { display: flex; flex-direction: column; gap: 8px; }
+        .sub-plan { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg-input); border-radius: 8px; font-size: 0.8rem; }
+        .sub-plan span:first-child { color: var(--text-secondary); }
+        .sub-plan .price { color: var(--accent); font-weight: 600; }
+        
+        /* Main Content */
+        .main-content { margin-left: 280px; padding: 30px; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
+        .page-title { font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--accent); text-shadow: var(--accent-glow); }
+        .top-actions { display: flex; gap: 15px; align-items: center; }
+        .search-box { display: flex; align-items: center; background: var(--bg-card); border: 2px solid var(--border); border-radius: 25px; padding: 10px 20px; gap: 10px; }
+        .search-box input { background: transparent; border: none; color: #fff; width: 250px; outline: none; }
+        .search-box input::placeholder { color: var(--text-muted); }
+        .notification-btn, .wallet-btn {
+            position: relative; width: 45px; height: 45px; border-radius: 50%;
+            background: var(--bg-card); border: 2px solid var(--border); color: var(--text-muted);
+            font-size: 1.2rem; cursor: pointer; transition: all 0.3s;
         }
-
-        .call-btn {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            font-size: 1.5rem;
-            transition: all 0.3s;
+        .notification-btn:hover, .wallet-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .notification-badge {
+            position: absolute; top: -5px; right: -5px; width: 20px; height: 20px;
+            background: #ff4444; border-radius: 50%; font-size: 0.7rem; display: flex; align-items: center; justify-content: center;
         }
-
-        .call-btn.mute, .call-btn.speaker {
-            background: var(--bg-input);
-            color: var(--text-primary);
-            border: 2px solid var(--border);
+        .wallet-balance { background: var(--bg-card); border: 2px solid var(--accent); border-radius: 25px; padding: 10px 20px; display: flex; align-items: center; gap: 10px; }
+        .wallet-balance span { color: var(--accent); font-family: 'Orbitron', sans-serif; font-weight: 600; }
+        
+        /* Page Sections */
+        .page-section { display: none; }
+        .page-section.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card {
+            background: var(--glass); border: 1px solid var(--border); border-radius: 15px;
+            padding: 25px; text-align: center; transition: all 0.3s;
         }
-
-        .call-btn.end {
-            background: var(--danger);
-            color: white;
+        .stat-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .stat-icon { font-size: 2.5rem; margin-bottom: 15px; }
+        .stat-number { font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--accent); font-weight: 700; }
+        .stat-label { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
+        
+        /* Section Header */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .section-title { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--accent); }
+        .view-all { color: var(--text-secondary); text-decoration: none; cursor: pointer; }
+        .view-all:hover { color: var(--accent); }
+        
+        /* Match Grid */
+        .match-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .match-card {
+            background: var(--glass); border: 1px solid var(--border); border-radius: 20px;
+            overflow: hidden; transition: all 0.3s; cursor: pointer;
         }
-
-        .call-btn:hover {
-            transform: scale(1.1);
-        }
-
-        /* Forum Section */
-        .forum-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 100px 20px 20px;
-        }
-
-        .forum-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .forum-categories {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .forum-category {
-            padding: 10px 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .forum-category:hover, .forum-category.active {
-            border-color: var(--text-primary);
-            background: rgba(57, 255, 20, 0.1);
-        }
-
-        .forum-topics {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .forum-topic {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .forum-topic:hover {
-            border-color: var(--text-primary);
-            transform: translateX(10px);
-        }
-
-        .topic-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-
-        .topic-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-
-        .topic-meta {
-            display: flex;
-            gap: 20px;
-            color: var(--gray);
-            font-size: 0.85rem;
-        }
-
-        .topic-preview {
-            color: var(--gray);
-            line-height: 1.6;
-        }
-
-        .topic-tags {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        /* Dating Section */
-        .dating-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 100px 20px 20px;
-        }
-
-        .dating-match-card {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 30px;
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
+        .match-card:hover { border-color: var(--accent); transform: translateY(-10px); box-shadow: 0 20px 40px rgba(57, 255, 20, 0.2); }
+        .match-card-header { position: relative; height: 200px; background: var(--bg-input); display: flex; align-items: center; justify-content: center; }
         .match-avatar {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 4px solid var(--text-primary);
-            margin: 0 auto 30px;
-            background: linear-gradient(135deg, var(--bg-input), var(--bg-dark));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .match-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .match-actions {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-
-        .match-btn {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 3px solid;
-            cursor: pointer;
-            font-size: 2rem;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .match-btn.dislike {
-            border-color: var(--danger);
-            background: transparent;
-            color: var(--danger);
-        }
-
-        .match-btn.superlike {
-            border-color: #00d4ff;
-            background: transparent;
-            color: #00d4ff;
-        }
-
-        .match-btn.like {
-            border-color: var(--text-primary);
-            background: var(--text-primary);
-            color: var(--bg-dark);
-        }
-
-        .match-btn:hover {
-            transform: scale(1.15);
-            box-shadow: 0 0 30px var(--accent-glow);
-        }
-
-        /* Social Circle */
-        .social-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 100px 20px 20px;
-        }
-
-        .social-feed {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .social-post {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 25px;
-            overflow: hidden;
-        }
-
-        .post-header {
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .post-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--text-primary), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-
-        .post-user-info h4 {
-            font-weight: 600;
-        }
-
-        .post-user-info span {
-            color: var(--gray);
-            font-size: 0.85rem;
-        }
-
-        .post-content {
-            padding: 0 20px 20px;
-        }
-
-        .post-text {
-            line-height: 1.7;
-            margin-bottom: 15px;
-        }
-
-        .post-image {
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 15px;
-        }
-
-        .post-actions {
-            padding: 15px 20px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 30px;
-        }
-
-        .post-action {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--gray);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .post-action:hover {
-            color: var(--text-primary);
-        }
-
-        /* Crowdfunding Section */
-        .crowdfunding-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 100px 20px 20px;
-        }
-
-        .crowdfunding-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
-        }
-
-        .crowdfunding-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 25px;
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-
-        .crowdfunding-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px var(--accent-glow);
-        }
-
-        .cf-image {
-            width: 100%;
-            height: 200px;
-            background: var(--bg-input);
-            position: relative;
-        }
-
-        .cf-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .cf-category {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: var(--text-primary);
-            color: var(--bg-dark);
-            padding: 5px 12px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .cf-body {
-            padding: 25px;
-        }
-
-        .cf-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-
-        .cf-creator {
-            color: var(--gray);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-
-        .cf-progress {
-            margin-bottom: 15px;
-        }
-
-        .cf-progress-bar {
-            height: 10px;
-            background: var(--bg-input);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .cf-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--text-primary), var(--accent));
-            border-radius: 5px;
-            transition: width 0.5s;
-        }
-
-        .cf-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .cf-stat {
-            text-align: center;
-        }
-
-        .cf-stat-value {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-
-        .cf-stat-label {
-            color: var(--gray);
-            font-size: 0.8rem;
-        }
-
-        .cf-youtube {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 15px;
-            background: rgba(255, 0, 0, 0.1);
-            border-radius: 10px;
-            margin-bottom: 15px;
-            color: #ff0000;
-            font-size: 0.9rem;
-        }
-
-        /* Subscription Section */
-        .subscription-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 100px 20px 20px;
-        }
-
-        .subscription-header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .subscription-plans {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-        }
-
-        .subscription-plan {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 25px;
-            padding: 35px;
-            text-align: center;
-            position: relative;
-            transition: all 0.3s;
-        }
-
-        .subscription-plan.featured {
-            border-color: var(--text-primary);
-            transform: scale(1.05);
-        }
-
-        .subscription-plan:hover {
-            box-shadow: 0 20px 40px var(--accent-glow);
-        }
-
-        .plan-badge {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, var(--text-primary), var(--accent));
-            color: var(--bg-dark);
-            padding: 8px 25px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 0.85rem;
-        }
-
-        .plan-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-        }
-
-        .plan-price {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            font-weight: 900;
-            margin-bottom: 5px;
-        }
-
-        .plan-price span {
-            font-size: 1rem;
-            color: var(--gray);
-        }
-
-        .plan-period {
-            color: var(--gray);
-            margin-bottom: 25px;
-        }
-
-        .plan-features {
-            list-style: none;
-            margin-bottom: 30px;
-        }
-
-        .plan-features li {
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .plan-features li::before {
-            content: '✓';
-            color: var(--text-primary);
-            font-weight: bold;
-        }
-
-        /* Wallet Section */
-        .wallet-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 100px 20px 20px;
-        }
-
-        .wallet-card {
-            background: linear-gradient(135deg, var(--bg-card), var(--bg-input));
-            border: 2px solid var(--border);
-            border-radius: 30px;
-            padding: 40px;
-            margin-bottom: 30px;
-        }
-
-        .wallet-balance {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .balance-label {
-            color: var(--gray);
-            margin-bottom: 10px;
-        }
-
-        .balance-amount {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 4rem;
-            font-weight: 900;
-        }
-
-        .wallet-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .wallet-btn {
-            padding: 20px;
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .wallet-btn:hover {
-            border-color: var(--text-primary);
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
-
-        .wallet-btn-icon {
-            font-size: 2rem;
-        }
-
-        .bank-form {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 25px;
-            padding: 30px;
-        }
-
-        .bank-form h3 {
-            margin-bottom: 25px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        /* Paywall Modal */
-        .paywall-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.95);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 3000;
-            padding: 20px;
-        }
-
-        .paywall-modal.active {
-            display: flex;
-        }
-
-        .paywall-content {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 30px;
-            padding: 50px;
-            max-width: 600px;
-            text-align: center;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .paywall-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-        }
-
-        .paywall-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-        }
-
-        .paywall-text {
-            color: var(--gray);
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .paywall-plans {
-            display: grid;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .paywall-plan {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px;
-            background: var(--bg-input);
-            border: 2px solid var(--border);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .paywall-plan:hover {
-            border-color: var(--text-primary);
-        }
-
-        .paywall-plan.selected {
-            border-color: var(--text-primary);
-            background: rgba(57, 255, 20, 0.1);
-        }
-
-        .paywall-plan-info {
-            text-align: left;
-        }
-
-        .paywall-plan-name {
-            font-weight: 700;
-        }
-
-        .paywall-plan-desc {
-            color: var(--gray);
-            font-size: 0.85rem;
-        }
-
-        .paywall-plan-price {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        /* Settings Section */
-        .settings-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 100px 20px 20px;
-        }
-
-        .settings-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 25px;
-            padding: 30px;
-            margin-bottom: 25px;
-        }
-
-        .settings-section h3 {
-            margin-bottom: 25px;
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        .settings-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .settings-row:last-child {
-            border-bottom: none;
-        }
-
-        .settings-label {
-            font-weight: 600;
-        }
-
-        .settings-value {
-            color: var(--gray);
-        }
-
-        /* Toggle Switch */
-        .toggle {
-            width: 55px;
-            height: 30px;
-            background: var(--bg-input);
-            border-radius: 15px;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .toggle.active {
-            background: var(--text-primary);
-        }
-
-        .toggle::after {
-            content: '';
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            background: white;
-            border-radius: 50%;
-            top: 3px;
-            left: 3px;
-            transition: all 0.3s;
-        }
-
-        .toggle.active::after {
-            left: 28px;
-        }
-
-        /* Ad Banner */
-        .ad-banner {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--bg-card);
-            border: 1px solid var(--warning);
-            border-radius: 20px;
-            padding: 15px 25px;
-            display: none;
-            align-items: center;
-            gap: 20px;
-            z-index: 1000;
-            max-width: 90%;
-        }
-
-        .ad-banner.show {
-            display: flex;
-        }
-
-        .ad-content {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .ad-close {
-            background: none;
-            border: none;
-            color: var(--gray);
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        .ad-progress {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 3px;
-            background: var(--text-primary);
-            border-radius: 0 0 20px 20px;
-            animation: adTimer 30s linear forwards;
-        }
-
-        @keyframes adTimer {
-            from { width: 100%; }
-            to { width: 0%; }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .nav-menu {
-                display: none;
-                position: absolute;
-                top: 70px;
-                left: 0;
-                right: 0;
-                background: var(--bg-dark);
-                flex-direction: column;
-                padding: 20px;
-                border-bottom: 1px solid var(--border);
-            }
-
-            .nav-menu.show {
-                display: flex;
-            }
-
-            .mobile-menu-btn {
-                display: block;
-            }
-
-            .chat-sidebar {
-                display: none;
-            }
-
-            .chat-container {
-                flex-direction: column;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .subscription-plan.featured {
-                transform: scale(1);
-            }
-
-            .subscription-plans {
-                grid-template-columns: 1fr;
-            }
-
-            .hero-title {
-                font-size: 2rem;
-            }
-
-            .users-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-dark);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--text-primary);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent);
-        }
+            width: 120px; height: 120px; border-radius: 50%; background: var(--gradient);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 4rem; border: 4px solid var(--accent);
+        }
+        .match-badge { position: absolute; top: 15px; left: 15px; background: var(--accent); color: #000; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .ai-badge { position: absolute; top: 15px; right: 15px; background: linear-gradient(135deg, #00d4ff, #0099ff); color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .online-indicator { position: absolute; bottom: 15px; right: 15px; width: 15px; height: 15px; background: var(--accent); border-radius: 50%; border: 3px solid var(--bg-dark); animation: pulse 2s infinite; }
+        .match-card-body { padding: 20px; }
+        .match-name { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; color: var(--accent); margin-bottom: 5px; }
+        .match-info { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px; }
+        .match-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .tag { background: rgba(57, 255, 20, 0.1); color: var(--text-secondary); padding: 5px 12px; border-radius: 15px; font-size: 0.75rem; }
+        .match-actions { display: flex; gap: 10px; }
+        .match-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .match-btn.primary { background: var(--gradient); color: #000; }
+        .match-btn.secondary { background: transparent; border: 2px solid var(--border); color: var(--text-muted); }
+        .match-btn:hover { transform: scale(1.05); }
+        
+        /* VIP Badge */
+        .vip-badge { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        
+        /* Toast */
+        .toast { position: fixed; bottom: 30px; right: 30px; background: var(--glass); border: 2px solid var(--accent); border-radius: 15px; padding: 20px 30px; display: flex; align-items: center; gap: 15px; transform: translateX(150%); transition: transform 0.3s ease; z-index: 2000; }
+        .toast.show { transform: translateX(0); }
+        .toast-icon { font-size: 1.5rem; }
+        .toast-message { color: #fff; }
+        
+        /* Responsive */
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-btn { display: none; width: 45px; height: 45px; background: var(--bg-card); border: 2px solid var(--border); border-radius: 10px; color: var(--accent); font-size: 1.5rem; cursor: pointer; }
+        @media (max-width: 900px) { .mobile-menu-btn { display: flex; align-items: center; justify-content: center; } }
+        
+        /* Footer */
+        .app-footer { text-align: center; padding: 30px; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 50px; }
+        .app-footer a { color: var(--accent); text-decoration: none; }
     </style>
 </head>
 <body>
-    <div class="bg-grid"></div>
+    <div class="bg-animation"></div>
+    <div class="grid-overlay"></div>
 
-    <!-- Navigation -->
-    <nav class="nav">
-        <a href="#" class="logo" onclick="showPage('home')">
-            <div class="logo-icon">💕</div>
-            <span>SweetDating</span>
-        </a>
-        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
-        <ul class="nav-menu" id="navMenu">
-            <li><a href="#" class="active" data-page="home" onclick="showPage('home')">🏠 Home</a></li>
-            <li><a href="#" data-page="match" onclick="showPage('match')">💕 Dating</a></li>
-            <li><a href="#" data-page="chat" onclick="showPage('chat')">💬 Chat</a></li>
-            <li><a href="#" data-page="voice" onclick="showPage('voice')">📞 Voice</a></li>
-            <li><a href="#" data-page="ai" onclick="showPage('ai')">🤖 AI Chat</a></li>
-            <li><a href="#" data-page="forum" onclick="showPage('forum')">💭 Forum</a></li>
-            <li><a href="#" data-page="social" onclick="showPage('social')">📱 Social</a></li>
-            <li><a href="#" data-page="crowdfunding" onclick="showPage('crowdfunding')">🎯 Crowdfunding</a></li>
-            <li><a href="#" data-page="wallet" onclick="showPage('wallet')">💰 Wallet</a></li>
-            <li><a href="#" data-page="subscription" onclick="showPage('subscription')">👑 Premium</a></li>
-            <li><a href="#" data-page="settings" onclick="showPage('settings')">⚙️ Settings</a></li>
-        </ul>
-        <div class="nav-right">
-            <select class="lang-selector" onchange="changeLanguage(this.value)">
-                <option value="en">🇺🇸 English</option>
-                <option value="zh">🇨🇳 中文</option>
-                <option value="ja">🇯🇵 日本語</option>
-                <option value="ko">🇰🇷 한국어</option>
-                <option value="es">🇪🇸 Español</option>
-                <option value="fr">🇫🇷 Français</option>
-                <option value="de">🇩🇪 Deutsch</option>
-                <option value="pt">🇧🇷 Português</option>
-            </select>
-            <button class="btn btn-primary" onclick="logout()">Logout</button>
-        </div>
-    </nav>
-
-    <!-- Login Page -->
-    <div class="page active" id="loginPage">
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
         <div class="login-container">
-            <div class="login-box glow-box">
-                <div class="login-logo glow-text">💕<br>Sweet Dating Connect</div>
-                <div class="login-subtitle">甜蜜約會通訊 - Global Dating Platform</div>
-                
-                <form onsubmit="handleLogin(event)">
-                    <div class="input-group">
-                        <label>Email Address</label>
-                        <input type="email" id="loginEmail" placeholder="Enter your email" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Password</label>
-                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">
-                        Login / 登入
-                    </button>
-                </form>
-
-                <div class="login-divider">
-                    <span>or continue with</span>
+            <div class="logo">
+                <h1>💕 甜蜜約會通訊</h1>
+                <p>Sweet Dating Pro</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email / 電子郵件</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" required>
                 </div>
-
-                <div class="social-login">
-                    <button class="social-btn">🌐</button>
-                    <button class="social-btn">📘</button>
-                    <button class="social-btn">🍎</button>
+                <div class="form-group">
+                    <label>Password / 密碼</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
                 </div>
-
-                <p style="margin-top: 20px; color: var(--gray);">
-                    Don't have an account? <a href="#" style="color: var(--text-primary);" onclick="showRegister()">Sign up</a>
-                </p>
+                <button type="submit" class="btn">Login / 登入</button>
+                <button type="button" class="btn btn-secondary" onclick="showRegister()">Register / 註冊</button>
+            </form>
+            <div class="social-login">
+                <p>Or continue with</p>
+                <div class="social-icons">
+                    <div class="social-icon">🌐</div>
+                    <div class="social-icon">📘</div>
+                    <div class="social-icon">🍎</div>
+                </div>
+            </div>
+            <div class="language-selector">
+                <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+                <button class="lang-btn" onclick="setLanguage('zh')">中文</button>
+                <button class="lang-btn" onclick="setLanguage('ja')">日本語</button>
             </div>
         </div>
     </div>
 
     <!-- Register Modal -->
     <div class="modal-overlay" id="registerModal">
-        <div class="login-box glow-box" style="max-width: 500px;">
-            <div class="login-logo glow-text" style="font-size: 1.5rem;">Join Sweet Dating</div>
+        <div class="register-box">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <div style="font-size: 3rem;">💕</div>
+                <h2 style="font-family: 'Orbitron', sans-serif; color: var(--accent); margin-top: 10px;">Join Sweet Dating</h2>
+            </div>
             <form onsubmit="handleRegister(event)">
                 <div class="form-grid">
-                    <div class="input-group">
+                    <div class="form-group">
                         <label>First Name</label>
-                        <input type="text" placeholder="First name" required>
+                        <input type="text" id="regFirstName" placeholder="First name" required>
                     </div>
-                    <div class="input-group">
+                    <div class="form-group">
                         <label>Last Name</label>
-                        <input type="text" placeholder="Last name" required>
+                        <input type="text" id="regLastName" placeholder="Last name" required>
                     </div>
                 </div>
-                <div class="input-group">
+                <div class="form-group">
                     <label>Email</label>
-                    <input type="email" placeholder="Enter your email" required>
+                    <input type="email" id="regEmail" placeholder="Enter your email" required>
                 </div>
-                <div class="input-group">
+                <div class="form-group">
                     <label>Password</label>
-                    <input type="password" placeholder="Create password" required>
+                    <input type="password" id="regPassword" placeholder="Create password" required>
                 </div>
-                <div class="input-group">
+                <div class="form-group">
                     <label>Country/Region</label>
-                    <select required>
+                    <select id="regCountry" required>
                         <option value="">Select country</option>
                         <option>🇺🇸 United States</option>
                         <option>🇬🇧 United Kingdom</option>
@@ -1854,53 +329,445 @@
                         <option>🇰🇷 South Korea</option>
                         <option>🇩🇪 Germany</option>
                         <option>🇫🇷 France</option>
-                        <option>🇧🇷 Brazil</option>
-                        <option>🇮🇳 India</option>
                         <option>🌍 Other</option>
                     </select>
                 </div>
-                <div class="input-group">
-                    <label>I am a</label>
-                    <select required>
-                        <option value="">Select preference</option>
-                        <option>Man seeking Woman</option>
-                        <option>Woman seeking Man</option>
-                        <option>Man seeking Man</option>
-                        <option>Woman seeking Woman</option>
-                        <option>Other</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">
-                    Create Account
-                </button>
+                <!-- Hidden VIP Code Field -->
+                <input type="hidden" id="registerVipCode" value="">
+                <button type="submit" class="btn">Create Account</button>
             </form>
-            <button class="btn btn-outline" style="width: 100%; margin-top: 15px;" onclick="closeRegister()">
-                Close
-            </button>
+            <button class="btn btn-secondary" onclick="closeRegister()">Close</button>
         </div>
     </div>
 
-    <!-- Home Dashboard -->
-    <div class="page" id="homePage">
-        <div class="dashboard">
-            <div class="hero-section">
-                <h1 class="hero-title glow-text">Connect Globally.<br>Find Your Match.</h1>
-                <p class="hero-subtitle">Join millions of users worldwide for meaningful connections, AI-powered conversations, and unforgettable dating experiences.</p>
-                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <button class="btn btn-primary" onclick="showPage('match')">Start Matching</button>
-                    <button class="btn btn-outline" onclick="showPage('subscription')">Go Premium</button>
+    <!-- Main App -->
+    <div class="app-container" id="appContainer">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-avatar" id="sidebarAvatar">👤</div>
+                <div class="user-name" id="sidebarUserName">User123</div>
+                <div class="user-status" id="sidebarUserStatus">Free Member</div>
+                <div class="status-badge">Online</div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item"><a class="nav-link active" onclick="showSection('dashboard')"><span class="nav-icon">🏠</span><span>Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showSection('match')"><span class="nav-icon">💕</span><span>Match Partners</span></a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showSection('chat')"><span class="nav-icon">💬</span><span>Messages</span></a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showSection('voice')"><span class="nav-icon">📞</span><span>Voice Call</span></a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showSection('ai-chat')"><span class="nav-icon">🤖</span><span>AI Chat</span></a></li>
+                <div class="nav-divider"></div>
+                <li class="nav-item"><a class="nav-link" onclick="showSection('forum')"><span class="nav-icon">📋</span><span>Forum</span></a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showSection('social')"><span class="nav-icon">🌍</span><span>Social Circle</span></a></li>
+                <div class="nav-divider"></div>
+                <li class="nav-item"><a class="nav-link" onclick="showSection('crowdfunding')"><span class="nav-icon">💰</span><span>Crowdfunding</span></a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showSection('wallet')"><span class="nav-icon">👛</span><span>Wallet</span></a></li>
+                <li class="nav-item"><a class="nav-link" onclick="showSection('subscription')"><span class="nav-icon">⭐</span><span>Subscription</span></a></li>
+                <div class="nav-divider"></div>
+                <li class="nav-item"><a class="nav-link" onclick="showSection('settings')"><span class="nav-icon">⚙️</span><span>Settings</span></a></li>
+                <li class="nav-item"><a class="nav-link" onclick="logout()"><span class="nav-icon">🚪</span><span>Logout</span></a></li>
+            </ul>
+            
+            <div class="subscription-box">
+                <h4>⭐ Premium Plan</h4>
+                <p>Unlock all features</p>
+                <div class="sub-plans">
+                    <div class="sub-plan"><span>1 Month</span><span class="price">$1</span></div>
+                    <div class="sub-plan"><span>3 Months</span><span class="price">$2.6</span></div>
+                    <div class="sub-plan"><span>6 Months</span><span class="price">$5</span></div>
+                    <div class="sub-plan"><span>1 Year</span><span class="price">$10</span></div>
+                </div>
+            </div>
+            
+            <div class="subscription-box" style="margin-top: 20px; background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(57, 255, 20, 0.1));">
+                <h4>🐙 GitHub</h4>
+                <p>View source code</p>
+                <a href="https://github.com/winfa2025-ship-it/sweet-dating-app" target="_blank" class="btn" style="padding: 12px; text-align: center; text-decoration: none;">
+                    View on GitHub
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="top-bar">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                <div class="top-actions">
+                    <div class="search-box"><span>🔍</span><input type="text" placeholder="Search..."></div>
+                    <button class="wallet-btn">👛</button>
+                    <button class="notification-btn">🔔<span class="notification-badge">3</span></button>
                 </div>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number glow-text">1,000+</div>
-                    <div class="stat-label">AI Companions</div>
+            <!-- Dashboard Section -->
+            <section class="page-section active" id="dashboardSection">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-icon">💕</div><div class="stat-number" id="onlineUsers">1,024</div><div class="stat-label">Online Now</div></div>
+                    <div class="stat-card"><div class="stat-icon">🤖</div><div class="stat-number">1,000</div><div class="stat-label">AI Agents</div></div>
+                    <div class="stat-card"><div class="stat-icon">🌍</div><div class="stat-number">50+</div><div class="stat-label">Countries</div></div>
+                    <div class="stat-card"><div class="stat-icon">💬</div><div class="stat-number">5.2K</div><div class="stat-label">Messages Today</div></div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number glow-text">50K+</div>
-                    <div class="stat-label">Active Users</div>
+                <div class="section-header">
+                    <h2 class="section-title">🌟 Featured Matches</h2>
+                    <a class="view-all" onclick="showSection('match')">View All →</a>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number glow-text">100+</div>
-                    <div class
+                <div class="match-grid" id="featuredMatches"></div>
+            </section>
+
+            <!-- Match Section -->
+            <section class="page-section" id="matchSection">
+                <div class="section-header"><h2 class="section-title">💕 Find Your Match</h2></div>
+                <div class="match-grid" id="matchGrid"></div>
+            </section>
+
+            <!-- Chat Section -->
+            <section class="page-section" id="chatSection">
+                <div class="section-header"><h2 class="section-title">💬 Messages</h2></div>
+                <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 50px; text-align: center;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">💬</div>
+                    <h3 style="color: var(--accent); margin-bottom: 10px;">Select a chat to start messaging</h3>
+                    <p style="color: var(--text-muted);">Go to Match Partners to find and connect with people</p>
+                    <button class="btn" onclick="showSection('match')" style="max-width: 300px; margin-top: 20px;">Find Partners</button>
+                </div>
+            </section>
+
+            <!-- Voice Call Section -->
+            <section class="page-section" id="voiceSection">
+                <div class="section-header"><h2 class="section-title">📞 Voice Call Center</h2></div>
+                <div class="match-grid" id="aiCharacterGrid"></div>
+            </section>
+
+            <!-- AI Chat Section -->
+            <section class="page-section" id="aiChatSection">
+                <div class="section-header"><h2 class="section-title">🤖 AI Chat Agents</h2></div>
+                <div class="match-grid" id="aiChatGrid"></div>
+            </section>
+
+            <!-- Forum Section -->
+            <section class="page-section" id="forumSection">
+                <div class="section-header"><h2 class="section-title">📋 Discussion Forum</h2></div>
+                <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 50px; text-align: center;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">📋</div>
+                    <h3 style="color: var(--accent); margin-bottom: 10px;">Forum Coming Soon</h3>
+                    <p style="color: var(--text-muted);">Create topics and discuss with the community</p>
+                </div>
+            </section>
+
+            <!-- Social Section -->
+            <section class="page-section" id="socialSection">
+                <div class="section-header"><h2 class="section-title">🌍 Social Circle</h2></div>
+                <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 50px; text-align: center;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">🌍</div>
+                    <h3 style="color: var(--accent); margin-bottom: 10px;">Social Circle Coming Soon</h3>
+                    <p style="color: var(--text-muted);">Share photos and interact with the community</p>
+                </div>
+            </section>
+
+            <!-- Crowdfunding Section -->
+            <section class="page-section" id="crowdfundingSection">
+                <div class="section-header"><h2 class="section-title">💰 International Crowdfunding</h2></div>
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-number">$125,000</div><div class="stat-label">Total Raised</div></div>
+                    <div class="stat-card"><div class="stat-number">156</div><div class="stat-label">Active Projects</div></div>
+                    <div class="stat-card"><div class="stat-number">89%</div><div class="stat-label">Success Rate</div></div>
+                    <div class="stat-card"><div class="stat-number">5%</div><div class="stat-label">Platform Fee</div></div>
+                </div>
+                <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 50px; text-align: center;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">💰</div>
+                    <h3 style="color: var(--accent); margin-bottom: 10px;">Crowdfunding Coming Soon</h3>
+                    <p style="color: var(--text-muted);">Create projects and receive support from the community</p>
+                </div>
+            </section>
+
+            <!-- Wallet Section -->
+            <section class="page-section" id="walletSection">
+                <div class="section-header"><h2 class="section-title">👛 My Wallet</h2></div>
+                <div style="background: linear-gradient(135deg, rgba(57, 255, 20, 0.2), rgba(0, 255, 136, 0.2)); border: 2px solid var(--accent); border-radius: 25px; padding: 50px; text-align: center;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">👛</div>
+                    <div style="font-size: 3rem; font-family: 'Orbitron', sans-serif; color: var(--accent);">$0.00</div>
+                    <p style="color: var(--text-muted); margin-top: 10px;">Available Balance</p>
+                </div>
+            </section>
+
+            <!-- Subscription Section -->
+            <section class="page-section" id="subscriptionSection">
+                <div class="section-header"><h2 class="section-title">⭐ Premium Subscription</h2></div>
+                <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 50px; text-align: center;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">⭐</div>
+                    <h3 style="color: var(--accent); margin-bottom: 10px;">VIP Access Available</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 30px;">Use invitation code VIP888 for permanent VIP access</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 800px; margin: 0 auto;">
+                        <div style="background: var(--bg-card); border: 2px solid var(--border); border-radius: 15px; padding: 25px;">
+                            <div style="font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--accent);">$1</div>
+                            <div style="color: var(--text-muted);">Monthly</div>
+                        </div>
+                        <div style="background: var(--bg-card); border: 2px solid var(--accent); border-radius: 15px; padding: 25px;">
+                            <div style="font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--accent);">$2.6</div>
+                            <div style="color: var(--text-muted);">Quarterly</div>
+                        </div>
+                        <div style="background: var(--bg-card); border: 2px solid var(--border); border-radius: 15px; padding: 25px;">
+                            <div style="font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--accent);">$5</div>
+                            <div style="color: var(--text-muted);">Half Year</div>
+                        </div>
+                        <div style="background: var(--bg-card); border: 2px solid var(--border); border-radius: 15px; padding: 25px;">
+                            <div style="font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--accent);">$10</div>
+                            <div style="color: var(--text-muted);">Yearly</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section class="page-section" id="settingsSection">
+                <div class="section-header"><h2 class="section-title">⚙️ Settings</h2></div>
+                <div style="background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 30px;">
+                    <div class="form-group">
+                        <label>Display Name</label>
+                        <input type="text" id="settingsName" value="User123">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="settingsEmail" value="user@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>VIP Code (Get permanent VIP access)</label>
+                        <input type="text" id="vipCodeInput" placeholder="Enter VIP code..." style="border-color: var(--accent);">
+                    </div>
+                    <button class="btn" onclick="applyVipCode()">Apply VIP Code</button>
+                    <div id="vipStatus" style="margin-top: 15px; padding: 10px; border-radius: 10px; display: none;"></div>
+                </div>
+            </section>
+
+            <footer class="app-footer">
+                <p>© 2024 甜蜜約會通訊 (Sweet Dating Pro) | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> | <a href="https://github.com/winfa2025-ship-it/sweet-dating-app" target="_blank">🐙 GitHub</a></p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">✓</span>
+        <span class="toast-message" id="toastMessage">Action completed!</span>
+    </div>
+
+    <script>
+        // Data
+        const aiAgents = [
+            { id: 1, name: 'Emma', country: '🇬🇧 UK', language: 'English', avatar: '👩', type: 'ai' },
+            { id: 2, name: 'Yuki', country: '🇯🇵 Japan', language: 'Japanese', avatar: '👩‍🦰', type: 'ai' },
+            { id: 3, name: 'Sofia', country: '🇪🇸 Spain', language: 'Spanish', avatar: '👱‍♀️', type: 'ai' },
+            { id: 4, name: 'Min-Ji', country: '🇰🇷 Korea', language: 'Korean', avatar: '👩‍🦱', type: 'ai' },
+            { id: 5, name: 'Luna', country: '🇫🇷 France', language: 'French', avatar: '👩', type: 'ai' },
+            { id: 6, name: 'Mei', country: '🇹🇼 Taiwan', language: 'Chinese', avatar: '👩‍🦰', type: 'ai' },
+            { id: 7, name: 'Anna', country: '🇩🇪 Germany', language: 'German', avatar: '👩‍🔬', type: 'ai' },
+            { id: 8, name: 'Maria', country: '🇧🇷 Brazil', language: 'Portuguese', avatar: '💃', type: 'ai' },
+        ];
+
+        const realUsers = [
+            { id: 1, name: 'David Chen', country: '🇺🇸 USA', age: 28, avatar: '👨‍💼', online: true, tags: ['Travel', 'Music'], bio: 'Adventure seeker 🌎', type: 'real' },
+            { id: 2, name: 'Sarah Kim', country: '🇰🇷 Korea', age: 25, avatar: '👩‍🎤', online: true, tags: ['K-Pop', 'Food'], bio: 'Foodie at heart 🍜', type: 'real' },
+            { id: 3, name: 'Marco Rossi', country: '🇮🇹 Italy', age: 30, avatar: '👨‍🍳', online: false, tags: ['Cooking', 'Art'], bio: 'Chef & artist 🎨', type: 'real' },
+            { id: 4, name: 'Lisa Wang', country: '🇹🇼 Taiwan', age: 27, avatar: '👩‍💻', online: true, tags: ['Tech', 'Gaming'], bio: 'Gamer girl 🎮', type: 'real' },
+        ];
+
+        // State
+        let currentUser = null;
+        let isVip = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFeaturedMatches();
+            loadAllMatches();
+            loadAICharacterGrid();
+            loadAIChatGrid();
+            checkVipStatus();
+        });
+
+        // Login/Register
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            if (email) login(email.split('@')[0]);
+        });
+
+        function login(username) {
+            currentUser = { username };
+            isVip = localStorage.getItem('is_vip') === 'true';
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContainer').classList.add('active');
+            document.getElementById('sidebarUserName').textContent = username;
+            updateVipStatus();
+            showToast('Welcome to Sweet Dating Pro! 🎉');
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('appContainer').classList.remove('active');
+            showToast('Logged out successfully');
+        }
+
+        function showRegister() {
+            document.getElementById('registerModal').classList.add('active');
+        }
+
+        function closeRegister() {
+            document.getElementById('registerModal').classList.remove('active');
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const firstName = document.getElementById('regFirstName').value;
+            const lastName = document.getElementById('regLastName').value;
+            const email = document.getElementById('regEmail').value;
+            const vipCode = document.getElementById('registerVipCode').value;
+
+            // Check VIP code
+            if (vipCode === 'VIP888') {
+                localStorage.setItem('is_vip', 'true');
+                showToast('🎉 VIP888 activated! You are now a permanent VIP member!');
+            }
+
+            closeRegister();
+            login(firstName);
+            showToast('Account created successfully! 🎉');
+        }
+
+        function setLanguage(lang) {
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            showToast('Language changed!');
+        }
+
+        // VIP Functions
+        function checkVipStatus() {
+            isVip = localStorage.getItem('is_vip') === 'true';
+            updateVipStatus();
+        }
+
+        function updateVipStatus() {
+            const statusEl = document.getElementById('sidebarUserStatus');
+            if (isVip) {
+                statusEl.innerHTML = '<span class="vip-badge">👑 VIP永久會員</span>';
+            } else {
+                statusEl.textContent = 'Free Member';
+            }
+        }
+
+        function applyVipCode() {
+            const code = document.getElementById('vipCodeInput').value.trim().toUpperCase();
+            const statusEl = document.getElementById('vipStatus');
+
+            if (code === 'VIP888') {
+                localStorage.setItem('is_vip', 'true');
+                isVip = true;
+                statusEl.style.display = 'block';
+                statusEl.style.background = 'rgba(57, 255, 20, 0.2)';
+                statusEl.style.border = '1px solid var(--accent)';
+                statusEl.style.color = 'var(--accent)';
+                statusEl.textContent = '🎉 VIP888 activated! You are now a permanent VIP member!';
+                updateVipStatus();
+                showToast('🎉 VIP永久會員已激活！');
+            } else {
+                statusEl.style.display = 'block';
+                statusEl.style.background = 'rgba(255, 68, 68, 0.2)';
+                statusEl.style.border = '1px solid #ff4444';
+                statusEl.style.color = '#ff4444';
+                statusEl.textContent = '❌ Invalid VIP code';
+                showToast('Invalid VIP code');
+            }
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId + 'Section').classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            const navLink = document.querySelector(`.nav-link[onclick="showSection('${sectionId}')"]`);
+            if (navLink) navLink.classList.add('active');
+            const titles = {
+                'dashboard': 'Dashboard', 'match': 'Find Your Match', 'chat': 'Messages',
+                'voice': 'Voice Call', 'ai-chat': 'AI Chat', 'forum': 'Forum',
+                'social': 'Social', 'crowdfunding': 'Crowdfunding', 'wallet': 'Wallet',
+                'subscription': 'Subscription', 'settings': 'Settings'
+            };
+            document.getElementById('pageTitle').textContent = titles[sectionId] || 'Dashboard';
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // Load Functions
+        function loadFeaturedMatches() {
+            const container = document.getElementById('featuredMatches');
+            const featured = [...aiAgents.slice(0, 2), ...realUsers.slice(0, 2)];
+            container.innerHTML = featured.map(user => createMatchCard(user)).join('');
+        }
+
+        function loadAllMatches() {
+            const container = document.getElementById('matchGrid');
+            const allUsers = [...aiAgents, ...realUsers];
+            container.innerHTML = allUsers.map(user => createMatchCard(user)).join('');
+        }
+
+        function createMatchCard(user) {
+            const isOnline = user.online !== false;
+            const isAI = user.type === 'ai';
+            return `
+                <div class="match-card">
+                    <div class="match-card-header">
+                        <div class="match-avatar">${user.avatar}</div>
+                        ${isOnline ? '<div class="online-indicator"></div>' : ''}
+                        ${isAI ? '<span class="ai-badge">AI</span>' : '<span class="match-badge">LIVE</span>'}
+                    </div>
+                    <div class="match-card-body">
+                        <div class="match-name">${user.name}</div>
+                        <div class="match-info">${user.country || ''} ${user.age ? '• ' + user.age : ''}</div>
+                        <div class="match-tags">${(user.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+                        <div class="match-actions">
+                            <button class="match-btn primary" onclick="showSection('chat')">💬 Chat</button>
+                            <button class="match-btn secondary">📞</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadAICharacterGrid() {
+            const container = document.getElementById('aiCharacterGrid');
+            container.innerHTML = aiAgents.map(agent => `
+                <div class="match-card">
+                    <div class="match-card-header">
+                        <div class="match-avatar">${agent.avatar}</div>
+                        <span class="ai-badge">AI</span>
+                    </div>
+                    <div class="match-card-body">
+                        <div class="match-name">${agent.name}</div>
+                        <div class="match-info">${agent.country} • ${agent.language}</div>
+                        <div class="match-actions">
+                            <button class="match-btn primary" onclick="showSection('chat')">💬 Chat</button>
+                            <button class="match-btn secondary">📞</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadAIChatGrid() {
+            const container = document.getElementById('aiChatGrid');
+            container.innerHTML = aiAgents.map(agent => createMatchCard(agent)).join('');
+        }
+
+        // Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>
